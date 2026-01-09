@@ -140,7 +140,7 @@ function updateCooldown() {
 }
 
 function checkCooldown() {
-  // جاهزة للتطوير لاحقًا (تخزين cooldown في DB)
+  // جاهزة للتطوير لاحقًا
 }
 
 /* ================= Top ================= */
@@ -175,7 +175,7 @@ function nextPage() {
   if (currentPage < totalPages) loadTop(currentPage + 1);
 }
 
-/* ================= Admin ================= */
+/* ================= Economy Admin ================= */
 async function addCoins() {
   const userId = document.getElementById("targetId").value;
   const amount = document.getElementById("amount").value;
@@ -193,6 +193,33 @@ async function addCoins() {
 
   loadLogs();
   loadOverview();
+}
+
+/* ================= Admin Management ================= */
+async function addAdmin() {
+  const userId = document.getElementById("adminId").value;
+
+  const res = await fetch("/api/admin/add-admin", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId })
+  });
+
+  const data = await res.json();
+  alert(data.error || "Admin Added Successfully");
+}
+
+async function removeAdmin() {
+  const userId = document.getElementById("adminId").value;
+
+  const res = await fetch("/api/admin/remove-admin", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId })
+  });
+
+  const data = await res.json();
+  alert(data.error || "Admin Removed Successfully");
 }
 
 /* ================= Logs ================= */
