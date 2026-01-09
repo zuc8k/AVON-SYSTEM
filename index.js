@@ -52,13 +52,13 @@ client.cooldowns = new Collection();
 
 /* ================= Handlers ================= */
 let amount = 0;
-const handle = fs.readdirSync("./src/handlers").filter(file => file.endsWith(".js"));
+const handlers = fs.readdirSync("./src/handlers").filter(f => f.endsWith(".js"));
 const data = require("./package.json");
 
 post(
   clc.cyanBright(`Welcome to ${clc.blueBright(data.name)}! | Version: ${clc.blueBright(data.version)}`) + "\n" +
-  `Coded By ${clc.yellow(`BooDyHsN`)} & ${clc.yellow(`AvonBots`)} With ${clc.redBright("❤️")}` + "\n" +
-  `Discord: ${clc.blueBright(`Avon-Community.`)} | ${clc.blueBright(`mr.boodyhsn`)}`,
+  `Coded By ${clc.yellow("BooDyHsN")} & ${clc.yellow("AvonBots")} With ${clc.redBright("❤️")}` + "\n" +
+  `Discord: ${clc.blueBright("Avon-Community.")} | ${clc.blueBright("mr.boodyhsn")}`,
   "W",
   "magentaBright",
   "cyanBright"
@@ -66,23 +66,23 @@ post(
 
 post(`Logging into the BOT...`, "S", "yellowBright", "greenBright");
 
-handle.forEach((file) => {
+handlers.forEach(file => {
   require(`./src/handlers/${file}`)(client);
-  amount += 1;
+  amount++;
 });
 
-post(`${clc.cyanBright(amount)} Handler Is Loaded!!`, "S", "yellowBright", "greenBright");
+post(`${clc.cyanBright(amount)} Handler Loaded Successfully!`, "S", "yellowBright", "greenBright");
 
 /* ================= Web Middleware ================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Static Dashboard
+// Static Dashboard Files
 app.use(express.static("./src/web/public"));
 
 // Session
 app.use(session({
-  secret: process.env.SESSION_SECRET || "supersecret",
+  secret: process.env.SESSION_SECRET || "avon_dashboard_secret",
   resave: false,
   saveUninitialized: false
 }));
@@ -91,7 +91,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ربط client بكل Request
+// Attach client to every request
 app.use((req, res, next) => {
   req.client = client;
   next();
@@ -100,17 +100,16 @@ app.use((req, res, next) => {
 /* ================= Routes ================= */
 app.use("/auth", require("./src/web/routes/auth"));
 
-/* ===== Dashboard APIs ===== */
-app.use("/api/overview", require("./src/web/routes/overview"));       // Overview
-app.use("/api/permissions", require("./src/web/routes/permissions")); // Sidebar Logic
-app.use("/api/economy", require("./src/web/routes/economy"));         // Economy
-app.use("/api/admin", require("./src/web/routes/admin"));             // Avon Panel
+app.use("/api/overview", require("./src/web/routes/overview"));
+app.use("/api/permissions", require("./src/web/routes/permissions"));
+app.use("/api/economy", require("./src/web/routes/economy"));
+app.use("/api/admin", require("./src/web/routes/admin"));
 
 /* ================= Web Server ================= */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   post(
-    `🌐 Web Dashboard + OAuth Running On Port ${PORT}`,
+    `🌐 Web Dashboard Running On Port ${PORT}`,
     "S",
     "cyanBright",
     "greenBright"
@@ -121,7 +120,7 @@ app.listen(PORT, () => {
 if (client.token) {
   client.login(client.token).catch(e => {
     post(
-      "The Bot Token You Entered Is Incorrect Or Bot INTENTS Are OFF!",
+      "Bot Token Is Invalid Or INTENTS Are Disabled!",
       "E",
       "red",
       "redBright"
@@ -138,7 +137,7 @@ if (client.token) {
 }
 
 /* ================= Anti Crash ================= */
-process.on("unhandledRejection", (reason) => error(reason));
-process.on("rejectionHandled", (promise) => error(promise));
-process.on("uncaughtException", (e) => error(e));
-process.on("uncaughtExceptionMonitor", (e) => error(e));
+process.on("unhandledRejection", reason => error(reason));
+process.on("rejectionHandled", promise => error(promise));
+process.on("uncaughtException", e => error(e));
+process.on("uncaughtExceptionMonitor", e => error(e));
