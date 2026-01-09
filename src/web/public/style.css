@@ -31,7 +31,7 @@ body {
 .sidebar nav a {
   display: block;
   padding: 10px;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
   color: #cbd5f5;
   text-decoration: none;
   cursor: pointer;
@@ -96,8 +96,8 @@ body {
   color: #000;
   font-weight: bold;
   transition: opacity 0.2s;
-  margin-right: 5px;
-  margin-top: 5px;
+  margin-right: 6px;
+  margin-top: 6px;
 }
 
 .primary:hover {
@@ -182,7 +182,8 @@ tr:hover td {
 
 .owner-box input {
   padding: 8px;
-  margin-right: 5px;
+  margin-right: 6px;
+  margin-top: 6px;
   border-radius: 6px;
   border: none;
   outline: none;
@@ -190,7 +191,7 @@ tr:hover td {
   color: #e5e7eb;
 }
 
-/* ===== Logs (Advanced) ===== */
+/* ===== Logs Controls ===== */
 .logs-controls {
   display: flex;
   gap: 10px;
@@ -207,11 +208,12 @@ tr:hover td {
   color: #e5e7eb;
 }
 
+/* ===== Logs Box ===== */
 .logs-box {
   background: #020617;
   border-radius: 10px;
   padding: 10px;
-  max-height: 300px;
+  max-height: 320px;
   overflow-y: auto;
 }
 
