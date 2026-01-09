@@ -99,14 +99,22 @@ app.use((req, res, next) => {
 
 /* ================= Routes ================= */
 app.use("/auth", require("./src/web/routes/auth"));
-app.use("/api/overview", require("./src/web/routes/overview")); // ✅ Overview
-app.use("/api/economy", require("./src/web/routes/economy"));
-app.use("/api/admin", require("./src/web/routes/admin"));
+
+/* ===== Dashboard APIs ===== */
+app.use("/api/overview", require("./src/web/routes/overview"));       // Overview
+app.use("/api/permissions", require("./src/web/routes/permissions")); // Sidebar Logic
+app.use("/api/economy", require("./src/web/routes/economy"));         // Economy
+app.use("/api/admin", require("./src/web/routes/admin"));             // Avon Panel
 
 /* ================= Web Server ================= */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  post(`🌐 Web Dashboard + OAuth Running On Port ${PORT}`, "S", "cyanBright", "greenBright");
+  post(
+    `🌐 Web Dashboard + OAuth Running On Port ${PORT}`,
+    "S",
+    "cyanBright",
+    "greenBright"
+  );
 });
 
 /* ================= Login Bot ================= */
