@@ -9,48 +9,101 @@
 
 <div class="layout">
 
+  <!-- ================= Sidebar ================= -->
   <aside class="sidebar">
     <h2 class="logo">🤖 AvonBot</h2>
     <nav>
+
+      <!-- Overview (فوق خالص) -->
+      <a onclick="showPage('overview')">👁️ Overview</a>
+
+      <!-- Main Pages -->
       <a onclick="showPage('dashboard')">🏠 Dashboard</a>
       <a onclick="showPage('economy')">💰 Economy</a>
       <a onclick="showPage('top')">🏆 Top</a>
-      <a id="ownerNav" style="display:none" onclick="showPage('owner')">👑 Owner</a>
+
+      <!-- Avon Panel (للأدمن فقط) -->
+      <a id="ownerNav" style="display:none" onclick="showPage('owner')">👑 Avon Panel</a>
+
+      <!-- Logout -->
       <a onclick="logout()">🚪 Logout</a>
+
     </nav>
   </aside>
 
+  <!-- ================= Main ================= -->
   <main class="main">
 
+    <!-- Top Bar -->
     <div class="topbar">
       <span id="userInfo">Loading...</span>
     </div>
 
-    <!-- Dashboard -->
-    <section id="dashboard" class="page">
-      <h1>Dashboard</h1>
+    <!-- ================= Overview ================= -->
+    <section id="overview" class="page">
+      <h1>Overview</h1>
+
       <div class="cards">
-        <div class="card"><h3>💰 Wallet</h3><p id="wallet">-</p></div>
-        <div class="card"><h3>⛏ Miner</h3><p id="miner">-</p></div>
-        <div class="card"><h3>🏠 Home</h3><p id="home">-</p></div>
+        <div class="card">
+          <h3>💰 Coins</h3>
+          <p id="ovCoins">-</p>
+        </div>
+
+        <div class="card">
+          <h3>⭐ Level</h3>
+          <p id="ovLevel">-</p>
+        </div>
+
+        <div class="card">
+          <h3>🏆 Rank</h3>
+          <p id="ovRank">-</p>
+        </div>
       </div>
     </section>
 
-    <!-- Economy -->
+    <!-- ================= Dashboard ================= -->
+    <section id="dashboard" class="page hidden">
+      <h1>Dashboard</h1>
+
+      <div class="cards">
+        <div class="card">
+          <h3>💰 Wallet</h3>
+          <p id="wallet">-</p>
+        </div>
+
+        <div class="card">
+          <h3>⛏ Miner</h3>
+          <p id="miner">-</p>
+        </div>
+
+        <div class="card">
+          <h3>🏠 Home</h3>
+          <p id="home">-</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Economy ================= -->
     <section id="economy" class="page hidden">
       <h1>Economy</h1>
+
       <button id="mineBtn" class="primary" onclick="mine()">⛏ Start Mining</button>
+
       <p id="mineResult"></p>
       <p id="cooldownBox" class="cooldown"></p>
     </section>
 
-    <!-- Top -->
+    <!-- ================= Top ================= -->
     <section id="top" class="page hidden">
       <h1>Top Users</h1>
 
       <table>
         <thead>
-          <tr><th>#</th><th>User</th><th>Coins</th></tr>
+          <tr>
+            <th>#</th>
+            <th>User</th>
+            <th>Coins</th>
+          </tr>
         </thead>
         <tbody id="topTable"></tbody>
       </table>
@@ -62,9 +115,9 @@
       </div>
     </section>
 
-    <!-- Owner -->
+    <!-- ================= Avon Panel ================= -->
     <section id="owner" class="page hidden">
-      <h1>Owner Panel</h1>
+      <h1>Avon Panel</h1>
 
       <div class="owner-box">
         <input id="targetId" placeholder="User ID">
@@ -73,7 +126,7 @@
         <p id="adminResult"></p>
       </div>
 
-      <h2>Logs</h2>
+      <h2>Economy Logs</h2>
       <pre id="logsBox"></pre>
     </section>
 
