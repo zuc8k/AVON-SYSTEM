@@ -14,7 +14,7 @@
     <h2 class="logo">🤖 AvonBot</h2>
     <nav>
 
-      <!-- Overview (فوق خالص) -->
+      <!-- Overview -->
       <a onclick="showPage('overview')">👁️ Overview</a>
 
       <!-- Main Pages -->
@@ -22,7 +22,7 @@
       <a onclick="showPage('economy')">💰 Economy</a>
       <a onclick="showPage('top')">🏆 Top</a>
 
-      <!-- Avon Panel (للأدمن فقط) -->
+      <!-- Avon Panel -->
       <a id="ownerNav" style="display:none" onclick="showPage('owner')">👑 Avon Panel</a>
 
       <!-- Logout -->
@@ -141,9 +141,35 @@
         <p id="adminResult"></p>
       </div>
 
-      <!-- ===== Logs ===== -->
+      <!-- ===== Economy Logs (Advanced) ===== -->
       <h2>Economy Logs</h2>
-      <pre id="logsBox"></pre>
+
+      <div class="logs-controls">
+        <input
+          id="logSearch"
+          placeholder="Search by type or user ID"
+          oninput="renderLogs()"
+        >
+
+        <select id="logFilter" onchange="renderLogs()">
+          <option value="ALL">All</option>
+          <option value="ADD">ADD</option>
+          <option value="REMOVE">REMOVE</option>
+          <option value="RESET">RESET</option>
+          <option value="MINE">MINE</option>
+          <option value="TRANSFER">TRANSFER</option>
+          <option value="FREEZE">FREEZE</option>
+          <option value="UNFREEZE">UNFREEZE</option>
+        </select>
+      </div>
+
+      <div id="logsContainer" class="logs-box"></div>
+
+      <div class="pagination">
+        <button onclick="prevLogPage()">◀</button>
+        <span id="logPageInfo">Page 1</span>
+        <button onclick="nextLogPage()">▶</button>
+      </div>
     </section>
 
   </main>
