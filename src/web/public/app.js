@@ -24,7 +24,7 @@ async function checkAuth() {
   // الصفحة الافتراضية
   showPage("overview");
 
-  // تحميل الصلاحيات (Avon Panel)
+  // تحميل الصلاحيات
   await loadPermissions();
 
   // تحميل البيانات
@@ -40,7 +40,6 @@ async function loadPermissions() {
   if (!res.ok) return;
 
   const perms = await res.json();
-
   if (perms.isAdmin) {
     document.getElementById("ownerNav").style.display = "block";
   }
@@ -104,7 +103,7 @@ async function mine() {
   document.getElementById("mineResult").textContent =
     `+${data.reward} Coins`;
 
-  startCooldown(3600); // ساعة
+  startCooldown(3600);
   loadProfile();
   loadOverview();
 }
@@ -117,9 +116,7 @@ function startCooldown(seconds) {
 }
 
 function updateCooldown() {
-  const now = Date.now();
-  const diff = cooldownEnd - now;
-
+  const diff = cooldownEnd - Date.now();
   const box = document.getElementById("cooldownBox");
   const btn = document.getElementById("mineBtn");
 
@@ -131,7 +128,6 @@ function updateCooldown() {
   }
 
   btn.disabled = true;
-
   const min = Math.floor(diff / 60000);
   const sec = Math.floor((diff % 60000) / 1000);
 
@@ -139,9 +135,7 @@ function updateCooldown() {
     `⏳ Cooldown: ${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 }
 
-function checkCooldown() {
-  // جاهزة للتطوير لاحقًا
-}
+function checkCooldown() {}
 
 /* ================= Top ================= */
 async function loadTop(page) {
@@ -186,13 +180,51 @@ async function addCoins() {
     body: JSON.stringify({ userId, amount })
   });
 
-  const data = await res.json();
-
-  document.getElementById("adminResult").textContent =
-    data.error ? data.error : "Coins Added";
-
+  alert((await res.json()).error || "Coins Added");
   loadLogs();
   loadOverview();
+}
+
+async function removeCoins() {
+  const userId = document.getElementById("targetId").value;
+  const amount = document.getElementById("amount").value;
+
+  const res = await fetch("/api/admin/remove", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, amount })
+  });
+
+  alert((await res.json()).error || "Coins Removed");
+  loadLogs();
+  loadOverview();
+}
+
+async function resetWallet() {
+  const userId = document.getElementById("targetId").value;
+
+  const res = await fetch("/api/admin/reset", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId })
+  });
+
+  alert((await res.json()).error || "Wallet Reset");
+  loadLogs();
+}
+
+async function toggleFreeze() {
+  const userId = document.getElementById("targetId").value;
+
+  const res = await fetch("/api/admin/freeze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId })
+  });
+
+  const data = await res.json();
+  alert(data.frozen ? "User Frozen" : "User Unfrozen");
+  loadLogs();
 }
 
 /* ================= Admin Management ================= */
@@ -205,8 +237,7 @@ async function addAdmin() {
     body: JSON.stringify({ userId })
   });
 
-  const data = await res.json();
-  alert(data.error || "Admin Added Successfully");
+  alert((await res.json()).error || "Admin Added");
 }
 
 async function removeAdmin() {
@@ -218,8 +249,7 @@ async function removeAdmin() {
     body: JSON.stringify({ userId })
   });
 
-  const data = await res.json();
-  alert(data.error || "Admin Removed Successfully");
+  alert((await res.json()).error || "Admin Removed");
 }
 
 /* ================= Logs ================= */
@@ -229,7 +259,7 @@ async function loadLogs() {
 
   document.getElementById("logsBox").textContent =
     logs.map(l =>
-      `[${new Date(l.time).toLocaleString()}] ${l.type} | ${l.amount}`
+      `[${new Date(l.time).toLocaleString()}] ${l.type} | ${l.amount || ""}`
     ).join("\n");
 }
 
