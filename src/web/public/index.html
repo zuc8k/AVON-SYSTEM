@@ -119,6 +119,16 @@
     <section id="owner" class="page hidden">
       <h1>Avon Panel</h1>
 
+      <!-- ===== Admin Management ===== -->
+      <h2>Admin Management</h2>
+      <div class="owner-box">
+        <input id="adminId" placeholder="Admin User ID">
+        <button class="primary" onclick="addAdmin()">Add Admin</button>
+        <button class="primary" onclick="removeAdmin()">Remove Admin</button>
+      </div>
+
+      <!-- ===== Economy Control ===== -->
+      <h2>Economy Control</h2>
       <div class="owner-box">
         <input id="targetId" placeholder="User ID">
         <input id="amount" placeholder="Coins Amount">
@@ -126,6 +136,7 @@
         <p id="adminResult"></p>
       </div>
 
+      <!-- ===== Logs ===== -->
       <h2>Economy Logs</h2>
       <pre id="logsBox"></pre>
     </section>
