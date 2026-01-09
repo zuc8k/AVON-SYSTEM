@@ -20,22 +20,22 @@
 
     <div class="card owner" id="adminBox" style="display:none;">
       <h2>👑 Owner Panel</h2>
+
       <input id="targetId" placeholder="Target User ID">
       <input id="amount" placeholder="Coins Amount">
       <button onclick="addCoins()">Add Coins</button>
       <p id="adminResult"></p>
+
+      <hr>
+      <h3>📜 Economy Logs</h3>
+      <button onclick="loadLogs()">Refresh Logs</button>
+      <pre id="logsBox"></pre>
     </div>
 
     <div class="card">
       <h2>⛏ Mine</h2>
       <button onclick="mine()">Mine</button>
       <p id="mineResult"></p>
-    </div>
-
-    <div class="card">
-      <h2>🏆 Top</h2>
-      <button onclick="loadTop()">Load Top</button>
-      <div id="topList"></div>
     </div>
   </div>
 </div>
