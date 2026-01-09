@@ -99,6 +99,7 @@ app.use((req, res, next) => {
 
 /* ================= Routes ================= */
 app.use("/auth", require("./src/web/routes/auth"));
+app.use("/api/overview", require("./src/web/routes/overview")); // ✅ Overview
 app.use("/api/economy", require("./src/web/routes/economy"));
 app.use("/api/admin", require("./src/web/routes/admin"));
 
