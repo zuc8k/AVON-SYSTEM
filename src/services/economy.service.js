@@ -1,3 +1,5 @@
+const economyConfig = require("../storage/economy.json");
+
 module.exports = {
 
   hasProfile: async (db, userId) => {
@@ -13,7 +15,7 @@ module.exports = {
 
     const data = {
       name: user.tag,
-      wallet: 1000,
+      wallet: economyConfig.default_coin || 1000,
       miner: 0,
       home: 0,
       work: 0,
@@ -24,12 +26,41 @@ module.exports = {
     return data;
   },
 
-  addCoins: async (db, userId, amount) => {
-    await db.add(`users.${userId}.wallet`, amount);
+  mine: async (db, userId) => {
+    if (!await db.has(`users.${userId}`)) {
+      return { error: "NO_PROFILE" };
+    }
+
+    const profile = await db.get(`users.${userId}`);
+
+    if (profile.home <= 0) {
+      return { error: "NO_HOME" };
+    }
+
+    if (profile.miner <= 0) {
+      return { error: "NO_MINER" };
+    }
+
+    const reward = economyConfig.miner[profile.miner];
+
+    await db.add(`users.${userId}.wallet`, reward);
+
+    return {
+      reward,
+      wallet: profile.wallet + reward,
+      minerLevel: profile.miner
+    };
   },
 
-  removeCoins: async (db, userId, amount) => {
-    await db.sub(`users.${userId}.wallet`, amount);
+  transfer: async (db, from, to, amount) => {
+    const sender = await db.get(`users.${from}`);
+    if (!sender) return { error: "NO_PROFILE" };
+    if (sender.wallet < amount) return { error: "NO_MONEY" };
+
+    await db.sub(`users.${from}.wallet`, amount);
+    await db.add(`users.${to}.wallet`, amount);
+
+    return { success: true };
   },
 
   getTop: async (db, page = 1, limit = 12) => {
