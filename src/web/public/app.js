@@ -21,19 +21,14 @@ async function checkAuth() {
   USER = await res.json();
   document.getElementById("userInfo").textContent = USER.username;
 
-  // الصفحة الافتراضية
   showPage("overview");
 
-  // تحميل الصلاحيات
   await loadPermissions();
 
-  // تحميل البيانات
   loadOverview();
   loadProfile();
   loadTop(1);
   checkCooldown();
-
-  // تحميل اللوجز لو أدمن
   loadLogs();
 }
 
@@ -61,10 +56,8 @@ async function loadOverview() {
 
   document.getElementById("ovCoins").textContent =
     (data.wallet || 0).toLocaleString();
-
   document.getElementById("ovLevel").textContent =
     data.level ?? 0;
-
   document.getElementById("ovRank").textContent =
     data.rank || "—";
 }
@@ -76,10 +69,8 @@ async function loadProfile() {
 
   document.getElementById("wallet").textContent =
     (data.wallet || 0).toLocaleString();
-
   document.getElementById("miner").textContent =
     data.miner ?? 0;
-
   document.getElementById("home").textContent =
     data.home ?? 0;
 }
@@ -96,16 +87,13 @@ async function mine() {
   });
 
   const data = await res.json();
-
   if (data.error) {
     document.getElementById("mineResult").textContent = data.error;
     btn.disabled = false;
     return;
   }
 
-  document.getElementById("mineResult").textContent =
-    `+${data.reward} Coins`;
-
+  document.getElementById("mineResult").textContent = `+${data.reward} Coins`;
   startCooldown(3600);
   loadProfile();
   loadOverview();
@@ -133,9 +121,7 @@ function updateCooldown() {
   btn.disabled = true;
   const min = Math.floor(diff / 60000);
   const sec = Math.floor((diff % 60000) / 1000);
-
-  box.textContent =
-    `⏳ Cooldown: ${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+  box.textContent = `⏳ Cooldown: ${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 }
 
 function checkCooldown() {}
@@ -255,7 +241,7 @@ async function removeAdmin() {
   alert((await res.json()).error || "Admin Removed");
 }
 
-/* ================= Logs (Advanced UI) ================= */
+/* ================= Logs (Advanced) ================= */
 let ALL_LOGS = [];
 let logPage = 1;
 const LOGS_PER_PAGE = 8;
@@ -274,16 +260,14 @@ function renderLogs() {
   const filter = document.getElementById("logFilter")?.value || "ALL";
 
   let filtered = ALL_LOGS.filter(l => {
-    const text =
-      `${l.type} ${l.to || ""} ${l.from || ""}`.toLowerCase();
-
+    const text = `${l.type} ${l.to || ""} ${l.from || ""}`.toLowerCase();
     if (filter !== "ALL" && l.type !== filter) return false;
     if (search && !text.includes(search)) return false;
     return true;
   });
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / LOGS_PER_PAGE));
-  logPage = Math.min(logPage, totalPages);
+  const total = Math.max(1, Math.ceil(filtered.length / LOGS_PER_PAGE));
+  logPage = Math.min(logPage, total);
 
   const start = (logPage - 1) * LOGS_PER_PAGE;
   const pageLogs = filtered.slice(start, start + LOGS_PER_PAGE);
@@ -302,7 +286,7 @@ function renderLogs() {
   });
 
   document.getElementById("logPageInfo").textContent =
-    `Page ${logPage} / ${totalPages}`;
+    `Page ${logPage} / ${total}`;
 }
 
 function nextLogPage() {
@@ -313,6 +297,22 @@ function nextLogPage() {
 function prevLogPage() {
   if (logPage > 1) logPage--;
   renderLogs();
+}
+
+/* ================= Export Logs ================= */
+function exportLogs() {
+  let csv = "time,type,from,to,amount\n";
+  ALL_LOGS.forEach(l => {
+    csv += `"${new Date(l.time).toISOString()}","${l.type}","${l.from || ""}","${l.to || ""}","${l.amount || ""}"\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "economy_logs.csv";
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 /* ================= Init ================= */
