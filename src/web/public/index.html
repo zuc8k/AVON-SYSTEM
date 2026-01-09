@@ -39,8 +39,9 @@
     <!-- Economy -->
     <section id="economy" class="page hidden">
       <h1>Economy</h1>
-      <button class="primary" onclick="mine()">⛏ Start Mining</button>
+      <button id="mineBtn" class="primary" onclick="mine()">⛏ Start Mining</button>
       <p id="mineResult"></p>
+      <p id="cooldownBox" class="cooldown"></p>
     </section>
 
     <!-- Top -->
@@ -54,7 +55,6 @@
         <tbody id="topTable"></tbody>
       </table>
 
-      <!-- Pagination -->
       <div class="pagination">
         <button id="prevBtn" onclick="prevPage()">◀</button>
         <span id="pageInfo">Page 1</span>
