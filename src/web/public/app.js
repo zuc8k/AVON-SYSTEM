@@ -4,22 +4,35 @@ let totalPages = 1;
 let cooldownTimer = null;
 let cooldownEnd = 0;
 
+/* ================= Page Switch ================= */
 function showPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
 }
 
+/* ================= Auth ================= */
 async function checkAuth() {
   const res = await fetch("/auth/me");
-  if (!res.ok) location.href = "/auth/discord";
+  if (!res.ok) {
+    location.href = "/auth/discord";
+    return;
+  }
 
   USER = await res.json();
   document.getElementById("userInfo").textContent = USER.username;
 
+  // الصفحة الافتراضية
+  showPage("overview");
+
+  // تحميل Overview
+  loadOverview();
+
+  // تحميل باقي البيانات
   loadProfile();
   loadTop(1);
   checkCooldown();
 
+  // فحص صلاحية Avon Panel
   const logsCheck = await fetch("/api/admin/logs");
   if (logsCheck.ok) {
     document.getElementById("ownerNav").style.display = "block";
@@ -27,20 +40,43 @@ async function checkAuth() {
   }
 }
 
+/* ================= Logout ================= */
 async function logout() {
   await fetch("/auth/logout");
   location.reload();
 }
 
+/* ================= Overview ================= */
+async function loadOverview() {
+  const res = await fetch("/api/overview");
+  const data = await res.json();
+
+  document.getElementById("ovCoins").textContent =
+    (data.wallet || 0).toLocaleString();
+
+  document.getElementById("ovLevel").textContent =
+    data.level ?? 0;
+
+  document.getElementById("ovRank").textContent =
+    data.rank || "—";
+}
+
+/* ================= Profile ================= */
 async function loadProfile() {
   const res = await fetch(`/api/economy/profile/${USER.id}`);
   const data = await res.json();
 
-  document.getElementById("wallet").textContent = data.wallet.toLocaleString();
-  document.getElementById("miner").textContent = data.miner;
-  document.getElementById("home").textContent = data.home;
+  document.getElementById("wallet").textContent =
+    (data.wallet || 0).toLocaleString();
+
+  document.getElementById("miner").textContent =
+    data.miner ?? 0;
+
+  document.getElementById("home").textContent =
+    data.home ?? 0;
 }
 
+/* ================= Mine ================= */
 async function mine() {
   const btn = document.getElementById("mineBtn");
   btn.disabled = true;
@@ -64,8 +100,10 @@ async function mine() {
 
   startCooldown(3600); // ساعة
   loadProfile();
+  loadOverview(); // تحديث Overview كمان
 }
 
+/* ================= Cooldown ================= */
 function startCooldown(seconds) {
   cooldownEnd = Date.now() + seconds * 1000;
   updateCooldown();
@@ -97,9 +135,10 @@ function updateCooldown() {
 }
 
 function checkCooldown() {
-  // لو حابب بعدين نخزن آخر وقت Mine في DB
+  // جاهزة للتطوير لاحقًا (تخزين cooldown في DB)
 }
 
+/* ================= Top ================= */
 async function loadTop(page) {
   const res = await fetch(`/api/economy/top?page=${page}`);
   const data = await res.json();
@@ -131,6 +170,7 @@ function nextPage() {
   if (currentPage < totalPages) loadTop(currentPage + 1);
 }
 
+/* ================= Admin ================= */
 async function addCoins() {
   const userId = document.getElementById("targetId").value;
   const amount = document.getElementById("amount").value;
@@ -146,8 +186,10 @@ async function addCoins() {
     data.error ? data.error : "Coins Added";
 
   loadLogs();
+  loadOverview();
 }
 
+/* ================= Logs ================= */
 async function loadLogs() {
   const res = await fetch("/api/admin/logs");
   const logs = await res.json();
@@ -158,4 +200,5 @@ async function loadLogs() {
     ).join("\n");
 }
 
+/* ================= Init ================= */
 checkAuth();
