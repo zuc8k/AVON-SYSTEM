@@ -13,7 +13,11 @@ const fs = require("fs");
 
 /* ================= Web ================= */
 const express = require("express");
+const session = require("express-session");
 const app = express();
+
+/* ================= OAuth ================= */
+const passport = require("./src/web/auth/discord");
 
 /* ================= Utils ================= */
 const post = require("./src/functions/post.js");
@@ -69,25 +73,42 @@ handle.forEach((file) => {
 
 post(`${clc.cyanBright(amount)} Handler Is Loaded!!`, "S", "yellowBright", "greenBright");
 
-/* ================= Web Server ================= */
+/* ================= Web Middleware ================= */
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-// ربط client بالـ API
+// Static Dashboard
+app.use(express.static("./src/web/public"));
+
+// Session
+app.use(session({
+  secret: process.env.SESSION_SECRET || "supersecret",
+  resave: false,
+  saveUninitialized: false
+}));
+
+// Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// ربط client بكل Request
 app.use((req, res, next) => {
   req.client = client;
   next();
 });
 
-// Routes
+/* ================= Routes ================= */
+app.use("/auth", require("./src/web/routes/auth"));
 app.use("/api/economy", require("./src/web/routes/economy"));
+app.use("/api/admin", require("./src/web/routes/admin"));
 
-// تشغيل السيرفر
+/* ================= Web Server ================= */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  post(`🌐 Web Dashboard Running On Port ${PORT}`, "S", "cyanBright", "greenBright");
+  post(`🌐 Web Dashboard + OAuth Running On Port ${PORT}`, "S", "cyanBright", "greenBright");
 });
 
-/* ================= Login ================= */
+/* ================= Login Bot ================= */
 if (client.token) {
   client.login(client.token).catch(e => {
     post(
