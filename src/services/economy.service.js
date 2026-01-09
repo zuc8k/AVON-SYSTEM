@@ -1,86 +1,84 @@
 const economyConfig = require("../storage/economy.json");
 
-module.exports = {
+async function pushLog(db, data) {
+  const log = {
+    ...data,
+    time: Date.now()
+  };
 
-  hasProfile: async (db, userId) => {
-    return await db.has(`users.${userId}`);
-  },
+  const logs = await db.get("logs.economy") || [];
+  logs.unshift(log);
+
+  // نخلي آخر 100 log بس
+  await db.set("logs.economy", logs.slice(0, 100));
+}
+
+module.exports = {
 
   getProfile: async (db, userId) => {
     return await db.get(`users.${userId}`);
   },
 
-  register: async (db, user) => {
-    if (await db.has(`users.${user.id}`)) return null;
-
-    const data = {
-      name: user.tag,
-      wallet: economyConfig.default_coin || 1000,
-      miner: 0,
-      home: 0,
-      work: 0,
-      rob: 0
-    };
-
-    await db.set(`users.${user.id}`, data);
-    return data;
-  },
-
   mine: async (db, userId) => {
-    if (!await db.has(`users.${userId}`)) {
-      return { error: "NO_PROFILE" };
-    }
+    if (!await db.has(`users.${userId}`)) return { error: "NO_PROFILE" };
 
     const profile = await db.get(`users.${userId}`);
-
-    if (profile.home <= 0) {
-      return { error: "NO_HOME" };
-    }
-
-    if (profile.miner <= 0) {
-      return { error: "NO_MINER" };
-    }
+    if (profile.home <= 0) return { error: "NO_HOME" };
+    if (profile.miner <= 0) return { error: "NO_MINER" };
 
     const reward = economyConfig.miner[profile.miner];
-
     await db.add(`users.${userId}.wallet`, reward);
+
+    await pushLog(db, {
+      type: "MINE",
+      to: userId,
+      amount: reward
+    });
 
     return {
       reward,
-      wallet: profile.wallet + reward,
-      minerLevel: profile.miner
+      wallet: profile.wallet + reward
     };
   },
 
   transfer: async (db, from, to, amount) => {
+    if (!await db.has(`users.${from}`)) return { error: "NO_PROFILE" };
+    if (!await db.has(`users.${to}`)) return { error: "NO_TARGET" };
+
     const sender = await db.get(`users.${from}`);
-    if (!sender) return { error: "NO_PROFILE" };
     if (sender.wallet < amount) return { error: "NO_MONEY" };
 
     await db.sub(`users.${from}.wallet`, amount);
     await db.add(`users.${to}.wallet`, amount);
 
+    await pushLog(db, {
+      type: "TRANSFER",
+      from,
+      to,
+      amount
+    });
+
     return { success: true };
   },
 
-  getTop: async (db, page = 1, limit = 12) => {
-    if (!await db.has("users")) return null;
+  addCoins: async (db, targetId, amount, ownerId) => {
+    if (!await db.has(`users.${targetId}`)) return { error: "NO_PROFILE" };
 
-    const users = Object.values(await db.get("users"))
-      .sort((a, b) => b.wallet - a.wallet);
+    await db.add(`users.${targetId}.wallet`, amount);
 
-    const start = (page - 1) * limit;
+    await pushLog(db, {
+      type: "ADD",
+      to: targetId,
+      amount,
+      by: ownerId
+    });
 
-    return {
-      page,
-      total: users.length,
-      totalPages: Math.ceil(users.length / limit),
-      users: users.slice(start, start + limit).map((u, i) => ({
-        rank: start + i + 1,
-        name: u.name,
-        wallet: u.wallet
-      }))
-    };
+    const profile = await db.get(`users.${targetId}`);
+    return { success: true, wallet: profile.wallet };
+  },
+
+  getLogs: async (db) => {
+    return await db.get("logs.economy") || [];
   }
 
 };
