@@ -1,6 +1,8 @@
 let USER;
 let currentPage = 1;
 let totalPages = 1;
+let cooldownTimer = null;
+let cooldownEnd = 0;
 
 function showPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
@@ -16,6 +18,7 @@ async function checkAuth() {
 
   loadProfile();
   loadTop(1);
+  checkCooldown();
 
   const logsCheck = await fetch("/api/admin/logs");
   if (logsCheck.ok) {
@@ -39,6 +42,9 @@ async function loadProfile() {
 }
 
 async function mine() {
+  const btn = document.getElementById("mineBtn");
+  btn.disabled = true;
+
   const res = await fetch("/api/economy/mine", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -46,10 +52,52 @@ async function mine() {
   });
 
   const data = await res.json();
-  document.getElementById("mineResult").textContent =
-    data.error ? data.error : `+${data.reward} Coins`;
 
+  if (data.error) {
+    document.getElementById("mineResult").textContent = data.error;
+    btn.disabled = false;
+    return;
+  }
+
+  document.getElementById("mineResult").textContent =
+    `+${data.reward} Coins`;
+
+  startCooldown(3600); // ساعة
   loadProfile();
+}
+
+function startCooldown(seconds) {
+  cooldownEnd = Date.now() + seconds * 1000;
+  updateCooldown();
+
+  cooldownTimer = setInterval(updateCooldown, 1000);
+}
+
+function updateCooldown() {
+  const now = Date.now();
+  const diff = cooldownEnd - now;
+
+  const box = document.getElementById("cooldownBox");
+  const btn = document.getElementById("mineBtn");
+
+  if (diff <= 0) {
+    clearInterval(cooldownTimer);
+    box.textContent = "✅ Ready to mine again";
+    btn.disabled = false;
+    return;
+  }
+
+  btn.disabled = true;
+
+  const min = Math.floor(diff / 60000);
+  const sec = Math.floor((diff % 60000) / 1000);
+
+  box.textContent =
+    `⏳ Cooldown: ${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+}
+
+function checkCooldown() {
+  // لو حابب بعدين نخزن آخر وقت Mine في DB
 }
 
 async function loadTop(page) {
