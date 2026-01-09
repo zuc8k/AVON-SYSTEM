@@ -24,19 +24,25 @@ async function checkAuth() {
   // الصفحة الافتراضية
   showPage("overview");
 
-  // تحميل Overview
-  loadOverview();
+  // تحميل الصلاحيات (Avon Panel)
+  await loadPermissions();
 
-  // تحميل باقي البيانات
+  // تحميل البيانات
+  loadOverview();
   loadProfile();
   loadTop(1);
   checkCooldown();
+}
 
-  // فحص صلاحية Avon Panel
-  const logsCheck = await fetch("/api/admin/logs");
-  if (logsCheck.ok) {
+/* ================= Permissions ================= */
+async function loadPermissions() {
+  const res = await fetch("/api/permissions");
+  if (!res.ok) return;
+
+  const perms = await res.json();
+
+  if (perms.isAdmin) {
     document.getElementById("ownerNav").style.display = "block";
-    loadLogs();
   }
 }
 
@@ -100,14 +106,13 @@ async function mine() {
 
   startCooldown(3600); // ساعة
   loadProfile();
-  loadOverview(); // تحديث Overview كمان
+  loadOverview();
 }
 
 /* ================= Cooldown ================= */
 function startCooldown(seconds) {
   cooldownEnd = Date.now() + seconds * 1000;
   updateCooldown();
-
   cooldownTimer = setInterval(updateCooldown, 1000);
 }
 
@@ -182,6 +187,7 @@ async function addCoins() {
   });
 
   const data = await res.json();
+
   document.getElementById("adminResult").textContent =
     data.error ? data.error : "Coins Added";
 
