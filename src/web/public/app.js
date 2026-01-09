@@ -1,4 +1,6 @@
 let USER;
+let currentPage = 1;
+let totalPages = 1;
 
 function showPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
@@ -10,11 +12,10 @@ async function checkAuth() {
   if (!res.ok) location.href = "/auth/discord";
 
   USER = await res.json();
-  document.getElementById("userInfo").textContent =
-    `${USER.username}`;
+  document.getElementById("userInfo").textContent = USER.username;
 
   loadProfile();
-  loadTop();
+  loadTop(1);
 
   const logsCheck = await fetch("/api/admin/logs");
   if (logsCheck.ok) {
@@ -51,9 +52,12 @@ async function mine() {
   loadProfile();
 }
 
-async function loadTop() {
-  const res = await fetch("/api/economy/top");
+async function loadTop(page) {
+  const res = await fetch(`/api/economy/top?page=${page}`);
   const data = await res.json();
+
+  currentPage = data.page;
+  totalPages = data.totalPages;
 
   const tbody = document.getElementById("topTable");
   tbody.innerHTML = "";
@@ -63,6 +67,20 @@ async function loadTop() {
     tr.innerHTML = `<td>${u.rank}</td><td>${u.name}</td><td>${u.wallet}</td>`;
     tbody.appendChild(tr);
   });
+
+  document.getElementById("pageInfo").textContent =
+    `Page ${currentPage} / ${totalPages}`;
+
+  document.getElementById("prevBtn").disabled = currentPage <= 1;
+  document.getElementById("nextBtn").disabled = currentPage >= totalPages;
+}
+
+function prevPage() {
+  if (currentPage > 1) loadTop(currentPage - 1);
+}
+
+function nextPage() {
+  if (currentPage < totalPages) loadTop(currentPage + 1);
 }
 
 async function addCoins() {
