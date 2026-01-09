@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const economy = require("../../services/economy.service");
 
 /* ================= Helpers ================= */
 function isOwner(req) {
@@ -10,15 +11,23 @@ async function getAdmins(db) {
   return (await db.get("dashboard.admins")) || [];
 }
 
-/* ================= Middleware ================= */
-router.use((req, res, next) => {
+async function isAdmin(req) {
+  const owners = req.client.config.owners || [];
+  const admins = await getAdmins(req.client.db);
+  return owners.includes(req.user.id) || admins.includes(req.user.id);
+}
+
+/* ================= Auth Middleware ================= */
+router.use(async (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({ error: "NOT_LOGGED_IN" });
   }
   next();
 });
 
-/* ================= Add Admin ================= */
+/* ================= Admin Management ================= */
+
+/* ---- Add Admin (Owner Only) ---- */
 router.post("/add-admin", async (req, res) => {
   if (!isOwner(req)) {
     return res.status(403).json({ error: "NOT_OWNER" });
@@ -42,7 +51,7 @@ router.post("/add-admin", async (req, res) => {
   res.json({ success: true, admins });
 });
 
-/* ================= Remove Admin ================= */
+/* ---- Remove Admin (Owner Only) ---- */
 router.post("/remove-admin", async (req, res) => {
   if (!isOwner(req)) {
     return res.status(403).json({ error: "NOT_OWNER" });
@@ -66,7 +75,7 @@ router.post("/remove-admin", async (req, res) => {
   res.json({ success: true, admins: newAdmins });
 });
 
-/* ================= Get Admins ================= */
+/* ---- Get Admins (Owner Only) ---- */
 router.get("/admins", async (req, res) => {
   if (!isOwner(req)) {
     return res.status(403).json({ error: "NOT_OWNER" });
@@ -76,19 +85,81 @@ router.get("/admins", async (req, res) => {
   res.json({ admins });
 });
 
-/* ================= Economy Logs ================= */
-router.get("/logs", async (req, res) => {
-  const db = req.client.db;
-  const admins = await getAdmins(db);
+/* ================= Economy Control (Admin + Owner) ================= */
 
-  const owners = req.client.config.owners || [];
-  const isAdmin = owners.includes(req.user.id) || admins.includes(req.user.id);
-
-  if (!isAdmin) {
+/* ---- Add Coins ---- */
+router.post("/add", async (req, res) => {
+  if (!await isAdmin(req)) {
     return res.status(403).json({ error: "NO_PERMISSION" });
   }
 
-  const logs = (await db.get("logs.economy")) || [];
+  const { userId, amount } = req.body;
+  res.json(
+    await economy.addCoins(
+      req.client.db,
+      userId,
+      Number(amount),
+      req.user.id
+    )
+  );
+});
+
+/* ---- Remove Coins ---- */
+router.post("/remove", async (req, res) => {
+  if (!await isAdmin(req)) {
+    return res.status(403).json({ error: "NO_PERMISSION" });
+  }
+
+  const { userId, amount } = req.body;
+  res.json(
+    await economy.removeCoins(
+      req.client.db,
+      userId,
+      Number(amount),
+      req.user.id
+    )
+  );
+});
+
+/* ---- Reset Wallet ---- */
+router.post("/reset", async (req, res) => {
+  if (!await isAdmin(req)) {
+    return res.status(403).json({ error: "NO_PERMISSION" });
+  }
+
+  const { userId } = req.body;
+  res.json(
+    await economy.resetWallet(
+      req.client.db,
+      userId,
+      req.user.id
+    )
+  );
+});
+
+/* ---- Freeze / Unfreeze ---- */
+router.post("/freeze", async (req, res) => {
+  if (!await isAdmin(req)) {
+    return res.status(403).json({ error: "NO_PERMISSION" });
+  }
+
+  const { userId } = req.body;
+  res.json(
+    await economy.toggleFreeze(
+      req.client.db,
+      userId,
+      req.user.id
+    )
+  );
+});
+
+/* ================= Logs ================= */
+router.get("/logs", async (req, res) => {
+  if (!await isAdmin(req)) {
+    return res.status(403).json({ error: "NO_PERMISSION" });
+  }
+
+  const logs = await economy.getLogs(req.client.db);
   res.json(logs);
 });
 
