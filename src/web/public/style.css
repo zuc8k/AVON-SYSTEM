@@ -96,6 +96,8 @@ body {
   color: #000;
   font-weight: bold;
   transition: opacity 0.2s;
+  margin-right: 5px;
+  margin-top: 5px;
 }
 
 .primary:hover {
@@ -130,7 +132,8 @@ th {
   text-align: left;
 }
 
-th, td {
+th,
+td {
   padding: 12px;
   border-bottom: 1px solid #1e293b;
 }
@@ -167,7 +170,8 @@ tr:hover td {
   cursor: not-allowed;
 }
 
-#pageInfo {
+#pageInfo,
+#logPageInfo {
   font-weight: bold;
 }
 
@@ -182,15 +186,76 @@ tr:hover td {
   border-radius: 6px;
   border: none;
   outline: none;
+  background: #020617;
+  color: #e5e7eb;
 }
 
-/* ===== Logs ===== */
-pre {
+/* ===== Logs (Advanced) ===== */
+.logs-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.logs-controls input,
+.logs-controls select {
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
   background: #020617;
-  padding: 15px;
+  color: #e5e7eb;
+}
+
+.logs-box {
+  background: #020617;
   border-radius: 10px;
+  padding: 10px;
   max-height: 300px;
   overflow-y: auto;
+}
+
+/* ===== Log Item ===== */
+.log {
+  padding: 8px;
+  margin-bottom: 6px;
+  border-radius: 6px;
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.5;
+}
+
+/* ===== Log Colors ===== */
+.log.ADD {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.log.REMOVE {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.log.RESET {
+  background: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+}
+
+.log.MINE {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.log.TRANSFER {
+  background: rgba(168, 85, 247, 0.15);
+  color: #a855f7;
+}
+
+.log.FREEZE {
+  background: rgba(100, 116, 139, 0.25);
+  color: #94a3b8;
+}
+
+.log.UNFREEZE {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
 }
