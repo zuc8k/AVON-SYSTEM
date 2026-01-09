@@ -22,8 +22,10 @@
       <a onclick="showPage('economy')">💰 Economy</a>
       <a onclick="showPage('top')">🏆 Top</a>
 
-      <!-- Avon Panel -->
-      <a id="ownerNav" style="display:none" onclick="showPage('owner')">👑 Avon Panel</a>
+      <!-- Avon Panel (Admins only) -->
+      <a id="ownerNav" style="display:none" onclick="showPage('owner')">
+        👑 Avon Panel
+      </a>
 
       <!-- Logout -->
       <a onclick="logout()">🚪 Logout</a>
@@ -87,7 +89,9 @@
     <section id="economy" class="page hidden">
       <h1>Economy</h1>
 
-      <button id="mineBtn" class="primary" onclick="mine()">⛏ Start Mining</button>
+      <button id="mineBtn" class="primary" onclick="mine()">
+        ⛏ Start Mining
+      </button>
 
       <p id="mineResult"></p>
       <p id="cooldownBox" class="cooldown"></p>
