@@ -11,10 +11,11 @@ async function checkAuth() {
   document.getElementById("userInfo").textContent =
     `Logged in as ${USER.username}`;
 
-  // Owner check
-  const owners = await fetch("/api/admin/check").catch(() => null);
-  if (owners?.ok) {
+  // لو Owner
+  const logsTest = await fetch("/api/admin/logs");
+  if (logsTest.ok) {
     document.getElementById("adminBox").style.display = "block";
+    loadLogs();
   }
 }
 
@@ -47,21 +48,19 @@ async function addCoins() {
 
   const data = await res.json();
   document.getElementById("adminResult").textContent =
-    data.error ? data.error : `✅ Wallet: ${data.wallet}`;
+    data.error ? data.error : `Wallet Now: ${data.wallet}`;
+
+  loadLogs();
 }
 
-async function loadTop() {
-  const res = await fetch("/api/economy/top");
-  const data = await res.json();
+async function loadLogs() {
+  const res = await fetch("/api/admin/logs");
+  const logs = await res.json();
 
-  const box = document.getElementById("topList");
-  box.innerHTML = "";
-
-  data.users.forEach(u => {
-    const div = document.createElement("div");
-    div.textContent = `#${u.rank} ${u.name} - ${u.wallet}`;
-    box.appendChild(div);
-  });
+  document.getElementById("logsBox").textContent =
+    logs.map(l =>
+      `[${new Date(l.time).toLocaleString()}] ${l.type} | from:${l.from || "-"} to:${l.to || "-"} | amount:${l.amount || "-"} | by:${l.by || "-"}`
+    ).join("\n");
 }
 
 checkAuth();
