@@ -32,6 +32,9 @@ async function checkAuth() {
   loadProfile();
   loadTop(1);
   checkCooldown();
+
+  // تحميل اللوجز لو أدمن
+  loadLogs();
 }
 
 /* ================= Permissions ================= */
@@ -252,15 +255,64 @@ async function removeAdmin() {
   alert((await res.json()).error || "Admin Removed");
 }
 
-/* ================= Logs ================= */
+/* ================= Logs (Advanced UI) ================= */
+let ALL_LOGS = [];
+let logPage = 1;
+const LOGS_PER_PAGE = 8;
+
 async function loadLogs() {
   const res = await fetch("/api/admin/logs");
-  const logs = await res.json();
+  if (!res.ok) return;
 
-  document.getElementById("logsBox").textContent =
-    logs.map(l =>
-      `[${new Date(l.time).toLocaleString()}] ${l.type} | ${l.amount || ""}`
-    ).join("\n");
+  ALL_LOGS = await res.json();
+  logPage = 1;
+  renderLogs();
+}
+
+function renderLogs() {
+  const search = document.getElementById("logSearch")?.value.toLowerCase() || "";
+  const filter = document.getElementById("logFilter")?.value || "ALL";
+
+  let filtered = ALL_LOGS.filter(l => {
+    const text =
+      `${l.type} ${l.to || ""} ${l.from || ""}`.toLowerCase();
+
+    if (filter !== "ALL" && l.type !== filter) return false;
+    if (search && !text.includes(search)) return false;
+    return true;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / LOGS_PER_PAGE));
+  logPage = Math.min(logPage, totalPages);
+
+  const start = (logPage - 1) * LOGS_PER_PAGE;
+  const pageLogs = filtered.slice(start, start + LOGS_PER_PAGE);
+
+  const box = document.getElementById("logsContainer");
+  if (!box) return;
+
+  box.innerHTML = "";
+
+  pageLogs.forEach(l => {
+    const div = document.createElement("div");
+    div.className = `log ${l.type}`;
+    div.textContent =
+      `[${new Date(l.time).toLocaleString()}] ${l.type} | ${l.amount || ""} | ${l.to || l.from || ""}`;
+    box.appendChild(div);
+  });
+
+  document.getElementById("logPageInfo").textContent =
+    `Page ${logPage} / ${totalPages}`;
+}
+
+function nextLogPage() {
+  logPage++;
+  renderLogs();
+}
+
+function prevLogPage() {
+  if (logPage > 1) logPage--;
+  renderLogs();
 }
 
 /* ================= Init ================= */
