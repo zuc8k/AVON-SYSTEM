@@ -1,55 +1,119 @@
-body {
-  background: #0f172a;
-  color: #e5e7eb;
+* {
+  box-sizing: border-box;
   font-family: Arial, sans-serif;
 }
 
-.container {
-  width: 600px;
-  margin: 40px auto;
+body {
+  margin: 0;
+  background: #0b0f1a;
+  color: #e5e7eb;
 }
 
-h1 {
-  text-align: center;
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background: #020617;
+  padding: 20px;
+}
+
+.logo {
+  color: #22c55e;
   margin-bottom: 30px;
+}
+
+.sidebar nav a {
+  display: block;
+  padding: 10px;
+  margin-bottom: 5px;
+  color: #cbd5f5;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.sidebar nav a:hover {
+  background: #1e293b;
+}
+
+/* Main */
+.main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.topbar {
+  background: #020617;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.page.hidden {
+  display: none;
+}
+
+/* Cards */
+.cards {
+  display: flex;
+  gap: 15px;
 }
 
 .card {
   background: #020617;
   padding: 20px;
-  margin-bottom: 20px;
   border-radius: 10px;
+  flex: 1;
+  text-align: center;
 }
 
-button {
+/* Buttons */
+.primary {
   background: #22c55e;
   border: none;
-  padding: 8px 14px;
-  margin-top: 10px;
-  cursor: pointer;
+  padding: 10px 20px;
   border-radius: 6px;
+  cursor: pointer;
+  color: #000;
+  font-weight: bold;
 }
 
-button:hover {
+.primary:hover {
   opacity: 0.9;
 }
 
-input {
+/* Table */
+table {
   width: 100%;
+  border-collapse: collapse;
+  background: #020617;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #1e293b;
+  text-align: left;
+}
+
+/* Owner */
+.owner-box input {
   padding: 8px;
+  margin-right: 5px;
   border-radius: 6px;
   border: none;
-  margin-bottom: 10px;
 }
 
 pre {
   background: #020617;
-  padding: 10px;
-  border-radius: 6px;
-  overflow-x: auto;
-}
-
-.rank {
-  padding: 6px 0;
-  border-bottom: 1px solid #1e293b;
+  padding: 15px;
+  border-radius: 10px;
+  max-height: 300px;
+  overflow-y: auto;
 }
