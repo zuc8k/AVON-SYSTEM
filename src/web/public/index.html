@@ -7,32 +7,39 @@
 </head>
 <body>
 
-  <div class="container">
-    <h1>💰 Economy Dashboard</h1>
+<div class="container">
+  <h1>💰 Economy Dashboard</h1>
 
-    <!-- USER -->
-    <div class="card">
-      <h2>👤 Profile</h2>
-      <input type="text" id="userId" placeholder="Discord User ID">
-      <button onclick="loadProfile()">Load Profile</button>
-      <pre id="profileBox">No data</pre>
+  <div id="authBox">
+    <a href="/auth/discord"><button>Login with Discord</button></a>
+  </div>
+
+  <div id="userBox" style="display:none;">
+    <p id="userInfo"></p>
+    <button onclick="logout()">Logout</button>
+
+    <div class="card owner" id="adminBox" style="display:none;">
+      <h2>👑 Owner Panel</h2>
+      <input id="targetId" placeholder="Target User ID">
+      <input id="amount" placeholder="Coins Amount">
+      <button onclick="addCoins()">Add Coins</button>
+      <p id="adminResult"></p>
     </div>
 
-    <!-- MINE -->
     <div class="card">
       <h2>⛏ Mine</h2>
-      <button onclick="mine()">Mine Coins</button>
+      <button onclick="mine()">Mine</button>
       <p id="mineResult"></p>
     </div>
 
-    <!-- TOP -->
     <div class="card">
-      <h2>🏆 Top Users</h2>
+      <h2>🏆 Top</h2>
       <button onclick="loadTop()">Load Top</button>
       <div id="topList"></div>
     </div>
   </div>
+</div>
 
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
