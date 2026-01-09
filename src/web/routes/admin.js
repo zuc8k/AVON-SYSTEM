@@ -1,38 +1,94 @@
 const router = require("express").Router();
-const economy = require("../../services/economy.service");
 
-/* ===== Owner Check ===== */
-function onlyOwner(req, res, next) {
-  if (!req.user) return res.status(401).json({ error: "NOT_LOGGED_IN" });
-
+/* ================= Helpers ================= */
+function isOwner(req) {
   const owners = req.client.config.owners || [];
-  if (!owners.includes(req.user.id)) {
-    return res.status(403).json({ error: "NOT_OWNER" });
-  }
-  next();
+  return owners.includes(req.user.id);
 }
 
-/* ===== Add Coins ===== */
-router.post("/add", onlyOwner, async (req, res) => {
-  const { userId, amount } = req.body;
-  if (!userId || !amount || isNaN(amount)) {
-    return res.status(400).json({ error: "INVALID_DATA" });
+async function getAdmins(db) {
+  return (await db.get("dashboard.admins")) || [];
+}
+
+/* ================= Middleware ================= */
+router.use((req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "NOT_LOGGED_IN" });
   }
-
-  const result = await economy.addCoins(
-    req.client.db,
-    userId,
-    Number(amount),
-    req.user.id
-  );
-
-  if (result.error) return res.status(400).json(result);
-  res.json(result);
+  next();
 });
 
-/* ===== Logs ===== */
-router.get("/logs", onlyOwner, async (req, res) => {
-  const logs = await economy.getLogs(req.client.db);
+/* ================= Add Admin ================= */
+router.post("/add-admin", async (req, res) => {
+  if (!isOwner(req)) {
+    return res.status(403).json({ error: "NOT_OWNER" });
+  }
+
+  const { userId } = req.body;
+  if (!userId) {
+    return res.json({ error: "NO_USER_ID" });
+  }
+
+  const db = req.client.db;
+  const admins = await getAdmins(db);
+
+  if (admins.includes(userId)) {
+    return res.json({ error: "ALREADY_ADMIN" });
+  }
+
+  admins.push(userId);
+  await db.set("dashboard.admins", admins);
+
+  res.json({ success: true, admins });
+});
+
+/* ================= Remove Admin ================= */
+router.post("/remove-admin", async (req, res) => {
+  if (!isOwner(req)) {
+    return res.status(403).json({ error: "NOT_OWNER" });
+  }
+
+  const { userId } = req.body;
+  if (!userId) {
+    return res.json({ error: "NO_USER_ID" });
+  }
+
+  const db = req.client.db;
+  const admins = await getAdmins(db);
+
+  if (!admins.includes(userId)) {
+    return res.json({ error: "NOT_ADMIN" });
+  }
+
+  const newAdmins = admins.filter(id => id !== userId);
+  await db.set("dashboard.admins", newAdmins);
+
+  res.json({ success: true, admins: newAdmins });
+});
+
+/* ================= Get Admins ================= */
+router.get("/admins", async (req, res) => {
+  if (!isOwner(req)) {
+    return res.status(403).json({ error: "NOT_OWNER" });
+  }
+
+  const admins = await getAdmins(req.client.db);
+  res.json({ admins });
+});
+
+/* ================= Economy Logs ================= */
+router.get("/logs", async (req, res) => {
+  const db = req.client.db;
+  const admins = await getAdmins(db);
+
+  const owners = req.client.config.owners || [];
+  const isAdmin = owners.includes(req.user.id) || admins.includes(req.user.id);
+
+  if (!isAdmin) {
+    return res.status(403).json({ error: "NO_PERMISSION" });
+  }
+
+  const logs = (await db.get("logs.economy")) || [];
   res.json(logs);
 });
 
