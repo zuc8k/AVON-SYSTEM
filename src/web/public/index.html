@@ -2,42 +2,78 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Economy Dashboard</title>
+  <title>AvonBot Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
-  <h1>💰 Economy Dashboard</h1>
+<div class="layout">
 
-  <div id="authBox">
-    <a href="/auth/discord"><button>Login with Discord</button></a>
-  </div>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2 class="logo">🤖 AvonBot</h2>
 
-  <div id="userBox" style="display:none;">
-    <p id="userInfo"></p>
-    <button onclick="logout()">Logout</button>
+    <nav>
+      <a onclick="showPage('dashboard')">🏠 Dashboard</a>
+      <a onclick="showPage('economy')">💰 Economy</a>
+      <a onclick="showPage('top')">🏆 Top</a>
+      <a id="ownerNav" style="display:none" onclick="showPage('owner')">👑 Owner</a>
+      <a onclick="logout()">🚪 Logout</a>
+    </nav>
+  </aside>
 
-    <div class="card owner" id="adminBox" style="display:none;">
-      <h2>👑 Owner Panel</h2>
+  <!-- Main -->
+  <main class="main">
 
-      <input id="targetId" placeholder="Target User ID">
-      <input id="amount" placeholder="Coins Amount">
-      <button onclick="addCoins()">Add Coins</button>
-      <p id="adminResult"></p>
-
-      <hr>
-      <h3>📜 Economy Logs</h3>
-      <button onclick="loadLogs()">Refresh Logs</button>
-      <pre id="logsBox"></pre>
+    <!-- Top Bar -->
+    <div class="topbar">
+      <span id="userInfo">Loading...</span>
     </div>
 
-    <div class="card">
-      <h2>⛏ Mine</h2>
-      <button onclick="mine()">Mine</button>
+    <!-- Dashboard -->
+    <section id="dashboard" class="page">
+      <h1>Dashboard</h1>
+      <div class="cards">
+        <div class="card"><h3>💰 Wallet</h3><p id="wallet">-</p></div>
+        <div class="card"><h3>⛏ Miner</h3><p id="miner">-</p></div>
+        <div class="card"><h3>🏠 Home</h3><p id="home">-</p></div>
+      </div>
+    </section>
+
+    <!-- Economy -->
+    <section id="economy" class="page hidden">
+      <h1>Economy</h1>
+      <button class="primary" onclick="mine()">⛏ Start Mining</button>
       <p id="mineResult"></p>
-    </div>
-  </div>
+    </section>
+
+    <!-- Top -->
+    <section id="top" class="page hidden">
+      <h1>Top Users</h1>
+      <table>
+        <thead>
+          <tr><th>#</th><th>User</th><th>Coins</th></tr>
+        </thead>
+        <tbody id="topTable"></tbody>
+      </table>
+    </section>
+
+    <!-- Owner -->
+    <section id="owner" class="page hidden">
+      <h1>Owner Panel</h1>
+
+      <div class="owner-box">
+        <input id="targetId" placeholder="User ID">
+        <input id="amount" placeholder="Coins Amount">
+        <button class="primary" onclick="addCoins()">Add Coins</button>
+        <p id="adminResult"></p>
+      </div>
+
+      <h2>Logs</h2>
+      <pre id="logsBox"></pre>
+    </section>
+
+  </main>
 </div>
 
 <script src="app.js"></script>
