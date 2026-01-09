@@ -83,10 +83,6 @@ body {
   font-weight: bold;
 }
 
-.primary:hover {
-  opacity: 0.9;
-}
-
 /* Table */
 table {
   width: 100%;
@@ -99,10 +95,31 @@ table {
 th, td {
   padding: 12px;
   border-bottom: 1px solid #1e293b;
-  text-align: left;
 }
 
-/* Owner */
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+  gap: 15px;
+}
+
+.pagination button {
+  background: #020617;
+  color: #e5e7eb;
+  border: 1px solid #1e293b;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .owner-box input {
   padding: 8px;
   margin-right: 5px;
